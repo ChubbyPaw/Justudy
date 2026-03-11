@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "id": "basic",
     "title": "NOIP 基础练习卷",
@@ -12,5 +12,12 @@
     "description": "涵盖 BFS、DFS、最短路、最小生成树等专题。",
     "duration": 120,
     "file": "exams/noip_graph.xlsx"
+  },
+  {
+    "id": "basic_1",
+    "title": "摸底测试",
+    "description": "包含基础语法、分支、循环入门内容。",
+    "duration": 90,
+    "file": "exams/test.xlsx"
   }
 ]
