@@ -1,4 +1,4 @@
-# NOIP GitHub Pages Multi-Exam
+# GitHub Pages Multi-Exam
 
 这是一个适合部署到 GitHub Pages 的静态网页考试项目：
 
