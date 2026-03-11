@@ -1,0 +1,16 @@
+[
+  {
+    "id": "basic",
+    "title": "NOIP 基础练习卷",
+    "description": "适合基础语法、循环、数组、排序等入门内容。",
+    "duration": 90,
+    "file": "exams/noip_basic.xlsx"
+  },
+  {
+    "id": "graph",
+    "title": "NOIP 图论提高卷",
+    "description": "涵盖 BFS、DFS、最短路、最小生成树等专题。",
+    "duration": 120,
+    "file": "exams/noip_graph.xlsx"
+  }
+]
