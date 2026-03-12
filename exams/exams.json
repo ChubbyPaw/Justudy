@@ -1,16 +1,16 @@
 ﻿[
   {
-    "id": "basic",
-    "title": "NOIP 基础练习卷",
-    "description": "适合基础语法、循环、数组、排序等入门内容。",
-    "duration": 90,
-    "file": "exams/noip_basic.xlsx"
-  },
-  {
     "id": "basic_1",
-    "title": "摸底测试",
+    "title": "摸底测试1",
     "description": "包含基础语法、分支、循环入门内容。",
     "duration": 90,
-    "file": "exams/test.xlsx"
+    "file": "exams/test1.xlsx"
+  },
+  {
+    "id": "basic_2",
+    "title": "摸底测试2",
+    "description": "包含基础语法、分支、循环、数组等内容。",
+    "duration": 90,
+    "file": "exams/test2.xlsx"
   }
 ]
