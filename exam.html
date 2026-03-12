@@ -286,14 +286,14 @@
             <div id="singleChoiceList"></div>
         </section>
 
-        <section class="panel hidden" id="trueFalseSection">
+        <section class="panel hidden" id="fillBlankSection">
             <h2 class="sec">填空题</h2>
-            <div id="tureFalseList"></div>
+            <div id="fillBlankList"></div>
         </section>
 
-        <section class="panel hidden" id="fillBlankSection">
+        <section class="panel hidden" id="trueFalseSection">
             <h2 class="sec">判断题</h2>
-            <div id="fillBlankList"></div>
+            <div id="tureFalseList"></div>
         </section>
 
         <section class="panel hidden" id="programmingSection">
@@ -392,7 +392,7 @@
             return rows
                 .filter(r => safeLower(r.Enabled || "Y") !== "n")
                 .map((r, idx) => ({
-                    id: text(r.ID || ("TF" + (idx + 1))),
+                    id: text(r.ID || ("TF" + (idx + 1))),  
                     title: text(r.Title),
                     answer: text(r.Answer),
                     score: Number(r.Score || 0) || 0
