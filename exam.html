@@ -336,7 +336,10 @@
         </section>
     </div>
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
     <script>
         const state = {
             config: { title: "考试ing", duration: 120, instructions: "" },
@@ -406,6 +409,7 @@
                     ].filter(x => x.text),
                     // 支持多个可能的列名：CodeBlock / Code / CodeSnippet / CodeSample
                     codeblock: text(r.CodeBlock || r.Code || r.CodeSnippet || r.CodeSample || ""),
+                    codeLang: text(r.CodeLang || r.Language || ""),
                     answer: text(r.Answer).toUpperCase(),
                     score: Number(r.Score || 0) || 0
                 }))
@@ -489,20 +493,20 @@
                 qs("singleChoiceSection").classList.remove("hidden");
                 state.singleChoiceQuestions.forEach((q, idx) => {
                     const html = `
-                            <div class="question">
-                                <div class="q-title">${idx + 1}. ${q.title}</div>
-                                <div class="q-score">分值：${q.score} 分</div>
-                                ${q.codeblock ? `<div class="code-block"><pre><code>${escapeHtml(q.codeblock)}</code></pre></div>` : ""}
-                                <div class="options">
-                                ${q.options.map(opt => `
-                                    <label class="option">
-                                    <input type="radio" name="${q.id}" value="${opt.key}" />
-                                    <span>${opt.key}. ${opt.text}</span>
-                                    </label>
-                                    `).join("")}
+                                <div class="question">
+                                    <div class="q-title">${idx + 1}. ${q.title}</div>
+                                    <div class="q-score">分值：${q.score} 分</div>
+                                    ${q.codeblock ? `<div class="code-block"><pre><code class="${q.codeLang ? 'language-' + escapeHtml(q.codeLang) : ''}">${escapeHtml(q.codeblock)}</code></pre></div>` : ""}
+                                    <div class="options">
+                                    ${q.options.map(opt => `
+                                        <label class="option">
+                                        <input type="radio" name="${q.id}" value="${opt.key}" />
+                                        <span>${opt.key}. ${opt.text}</span>
+                                        </label>
+                                        `).join("")}
+                                    </div>
                                 </div>
-                            </div>
-                        `;
+                            `;
                     scWrap.insertAdjacentHTML("beforeend", html);
                 });
             }
@@ -511,14 +515,14 @@
                 qs("fillBlankSection").classList.remove("hidden");
                 state.fillBlankQuestions.forEach((q, idx) => {
                     const html = `
-                            <div class="question">
-                                <div class="q-title">${idx + 1}. ${q.title}</div>
-                                <div class="q-score">分值：${q.score} 分</div>
-                                <div style="margin-top:10px;">
-                                    <input type="text" id="${q.id}" placeholder="请输入答案" />
+                                <div class="question">
+                                    <div class="q-title">${idx + 1}. ${q.title}</div>
+                                    <div class="q-score">分值：${q.score} 分</div>
+                                    <div style="margin-top:10px;">
+                                        <input type="text" id="${q.id}" placeholder="请输入答案" />
+                                    </div>
                                 </div>
-                            </div>
-                        `;
+                            `;
                     fbWrap.insertAdjacentHTML("beforeend", html);
                 });
             }
@@ -527,21 +531,21 @@
                 qs("trueFalseSection").classList.remove("hidden");
                 state.trueFalseQuestions.forEach((q, idx) => {
                     const html = `
-                            <div class="question">
-                                <div class="q-title">${idx + 1}. ${q.title}</div>
-                                <div class="q-score">分值：${q.score} 分</div>
-                                <div class="options inline">
-                                    <label class="option">
-                                        <input type="radio" name="${q.id}" value="T" />
-                                        <span>正确</span>
-                                    </label>
-                                    <label class="option">
-                                        <input type="radio" name="${q.id}" value="F" />
-                                        <span>错误</span>
-                                    </label>
+                                <div class="question">
+                                    <div class="q-title">${idx + 1}. ${q.title}</div>
+                                    <div class="q-score">分值：${q.score} 分</div>
+                                    <div class="options inline">
+                                        <label class="option">
+                                            <input type="radio" name="${q.id}" value="T" />
+                                            <span>正确</span>
+                                        </label>
+                                        <label class="option">
+                                            <input type="radio" name="${q.id}" value="F" />
+                                            <span>错误</span>
+                                        </label>
+                                    </div>
                                 </div>
-                            </div>
-                        `;
+                            `;
                     tfWrap.insertAdjacentHTML("beforeend", html);
                 });
             }
@@ -550,21 +554,28 @@
                 qs("programmingSection").classList.remove("hidden");
                 state.programmingQuestions.forEach((q, idx) => {
                     const html = `
-                            <div class="question">
-                                <div class="q-title">${idx + 1}. ${q.title}</div>
-                                <div class="q-score">分值：${q.score} 分（需人工阅卷）</div>
-                                <div class="muted" style="margin-top:10px;white-space:pre-wrap;line-height:1.9;">${q.description || "请在下方书写代码或解题思路。"}</div>
-                                <div style="margin-top:10px;">
-                                <textarea id="${q.id}" placeholder="请输入代码或解题思路"></textarea>
+                                <div class="question">
+                                    <div class="q-title">${idx + 1}. ${q.title}</div>
+                                    <div class="q-score">分值：${q.score} 分（需人工阅卷）</div>
+                                    <div class="muted" style="margin-top:10px;white-space:pre-wrap;line-height:1.9;">${q.description || "请在下方书写代码或解题思路。"}</div>
+                                    <div style="margin-top:10px;">
+                                    <textarea id="${q.id}" placeholder="请输入代码或解题思路"></textarea>
+                                    </div>
                                 </div>
-                            </div>
-                        `;
+                            `;
                     pgWrap.insertAdjacentHTML("beforeend", html);
                 });
             }
 
             bindProgress();
             qs("totalScoreText").textContent = totalScore();
+
+            // 渲染完成后调用高亮（放在 renderQuestions() 的末尾，调用 bindProgress() 之后）
+            if (window.hljs) {
+                document.querySelectorAll('pre code').forEach(el => {
+                    try { hljs.highlightElement(el); } catch (e) { /* 忽略单个高亮错误 */ }
+                });
+            }
         }
 
         function answeredCount() {
@@ -658,11 +669,11 @@
             qs("objectiveScore").textContent = score;
             qs("objectiveTotal").textContent = objectiveTotal();
             qs("resultList").innerHTML = `
-                    <div>${autoSubmit ? "时间到，系统已自动交卷。" : "你已完成交卷。"}</div>
-                    <div style="margin-top:8px;">考生：${text(qs("studentName").value) || "未填写"} / ${text(qs("studentClass").value) || "未填写"}</div>
-                    <div style="margin-top:8px;white-space:pre-wrap;">${lines.join("\n")}</div>
-                    <div style="margin-top:10px;">程序设计题需要人工阅卷，不计入上方自动得分。</div>
-                `;
+                        <div>${autoSubmit ? "时间到，系统已自动交卷。" : "你已完成交卷。"}</div>
+                        <div style="margin-top:8px;">考生：${text(qs("studentName").value) || "未填写"} / ${text(qs("studentClass").value) || "未填写"}</div>
+                        <div style="margin-top:8px;white-space:pre-wrap;">${lines.join("\n")}</div>
+                        <div style="margin-top:10px;">程序设计题需要人工阅卷，不计入上方自动得分。</div>
+                    `;
             window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
         }
 
@@ -680,19 +691,19 @@
                 state.programmingQuestions = wb.Sheets["Programming"] ? parseProgramming(wb.Sheets["Programming"]) : [];
                 qs("examTitleTop").textContent = state.config.title || "NOIP 在线考试";
                 qs("introText").innerHTML = `
-                        <strong>${state.config.title}</strong><br>
-                        考试时长：${state.config.duration} 分钟<br>
-                        ${state.config.instructions || "请认真作答，客观题自动判分，程序设计题需人工阅卷。"}<br>
-                        当前题库文件：<code>${examFile}</code>
-                    `;
+                            <strong>${state.config.title}</strong><br>
+                            考试时长：${state.config.duration} 分钟<br>
+                            ${state.config.instructions || "请认真作答，客观题自动判分，程序设计题需人工阅卷。"}<br>
+                            当前题库文件：<code>${examFile}</code>
+                        `;
                 renderQuestions();
                 startTimer();
                 qs("submitBtn").addEventListener("click", () => submitExam(false));
             } catch (err) {
                 qs("introText").innerHTML = `
-                        <span style="color:#b42318;font-weight:700;">试卷加载失败：</span>${err.message}<br>
-                        请返回主页检查试卷配置文件和题库路径是否正确。
-                    `;
+                            <span style="color:#b42318;font-weight:700;">试卷加载失败：</span>${err.message}<br>
+                            请返回主页检查试卷配置文件和题库路径是否正确。
+                        `;
             }
         }
         init();
