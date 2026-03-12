@@ -173,6 +173,11 @@
             gap: 8px
         }
 
+        .options.inline {
+            display: flex;
+            gap: 10px;
+        }
+
         label.option {
             display: flex;
             align-items: flex-start;
@@ -492,7 +497,7 @@
                             <div class="question">
                                 <div class="q-title">${idx + 1}. ${q.title}</div>
                                 <div class="q-score">分值：${q.score} 分</div>
-                                <div class="options">
+                                <div class="options inline">
                                     <label class="option">
                                         <input type="radio" name="${q.id}" value="T" />
                                         <span>正确</span>
