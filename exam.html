@@ -420,7 +420,6 @@
             };
         }
 
-        // 转义 HTML 用于在 <pre><code> 中安全渲染代码
         function escapeHtml(v) {
             return (v ?? "").toString()
                 .replace(/&/g, "&amp;")
@@ -443,7 +442,6 @@
                         { key: "C", text: text(r.OptionC) },
                         { key: "D", text: text(r.OptionD) }
                     ].filter(x => x.text),
-                    // 支持多个可能的列名：CodeBlock / Code / CodeSnippet / CodeSample
                     codeblock: text(r.CodeBlock || r.Code || r.CodeSnippet || r.CodeSample || ""),
                     codeLang: text(r.CodeLang || r.Language || ""),
                     answer: text(r.Answer).toUpperCase(),
@@ -464,7 +462,7 @@
                 }))
                 .filter(q => q.title);
         }
-        // 将各种可能的答案形式规范为 "T" 或 "F"
+
         function normalizeTF(v) {
             const s = text(v).toLowerCase();
             if (!s) return "";
@@ -531,8 +529,8 @@
                     const html = `
                                 <div class="question">
                                     <div class="q-title">${idx + 1}. ${q.title}</div>
-                                    <div class="q-score">分值：${q.score} 分</div>
                                     ${q.codeblock ? `<div class="code-block"><pre><code class="${q.codeLang ? 'language-' + escapeHtml(q.codeLang) : ''}">${escapeHtml(q.codeblock)}</code></pre></div>` : ""}
+                                    <div class="q-score">分值：${q.score} 分</div>
                                     <div class="options">
                                     ${q.options.map(opt => `
                                         <label class="option">
@@ -696,7 +694,7 @@
             state.trueFalseQuestions.forEach((q, idx) => {
                 const selected = document.querySelector(`input[name="${q.id}"]:checked`);
                 const ans = selected ? selected.value : "";
-                const ok = ans && ans === q.answer; // q.answer 已在 parse 时规范为 "T"/"F"
+                const ok = ans && ans === q.answer;
                 if (ok) score += q.score;
                 lines.push(`判断题 ${idx + 1}：你的答案 ${ans || "未作答"}，标准答案 ${q.answer || "未设置"}，${ok ? "得分" : "失分"} ${ok ? q.score : 0} / ${q.score}`);
             });
