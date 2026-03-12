@@ -242,6 +242,26 @@
             color: var(--muted)
         }
 
+        /* 新增：代码展示样式 */
+        .code-block {
+            margin-top: 12px;
+            background: #0b1220;
+            color: #e6edf3;
+            border-radius: 10px;
+            padding: 12px;
+            overflow: auto;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Noto Sans Mono", monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            border: 1px solid rgba(255,255,255,0.04);
+            white-space: pre;
+        }
+
+        .code-block code {
+            display: block;
+            white-space: pre;
+        }
+
         @media (max-width:760px) {
             .row {
                 grid-template-columns: 1fr
@@ -361,6 +381,16 @@
             };
         }
 
+        // 转义 HTML 用于在 <pre><code> 中安全渲染代码
+        function escapeHtml(v) {
+            return (v ?? "").toString()
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
         function parseSingleChoice(ws) {
             const rows = XLSX.utils.sheet_to_json(ws, { defval: "" });
             return rows
@@ -374,6 +404,8 @@
                         { key: "C", text: text(r.OptionC) },
                         { key: "D", text: text(r.OptionD) }
                     ].filter(x => x.text),
+                    // 支持多个可能的列名：CodeBlock / Code / CodeSnippet / CodeSample
+                    codeblock: text(r.CodeBlock || r.Code || r.CodeSnippet || r.CodeSample || ""),
                     answer: text(r.Answer).toUpperCase(),
                     score: Number(r.Score || 0) || 0
                 }))
@@ -460,6 +492,7 @@
                             <div class="question">
                                 <div class="q-title">${idx + 1}. ${q.title}</div>
                                 <div class="q-score">分值：${q.score} 分</div>
+                                ${q.codeblock ? `<div class="code-block"><pre><code>${escapeHtml(q.codeblock)}</code></pre></div>` : ""}
                                 <div class="options">
                                 ${q.options.map(opt => `
                                     <label class="option">
