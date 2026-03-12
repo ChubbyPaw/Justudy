@@ -387,7 +387,6 @@
                 }))
                 .filter(q => q.title);
         }
-
         // 将各种可能的答案形式规范为 "T" 或 "F"
         function normalizeTF(v) {
             const s = text(v).toLowerCase();
@@ -400,7 +399,6 @@
             if (first === "t" || first === "y" || first === "对") return "T";
             if (first === "f" || first === "n" || first === "错") return "F";
             return text(v).toUpperCase();
-        }
 
         function parseTrueFalse(ws) {
             const rows = XLSX.utils.sheet_to_json(ws, { defval: "" });
@@ -409,7 +407,7 @@
                 .map((r, idx) => ({
                     id: text(r.ID || ("TF" + (idx + 1))),
                     title: text(r.Title),
-                    answer: normalizeTF(r.Answer),
+                    answer: text(r.Answer),
                     score: Number(r.Score || 0) || 0
                 }))
                 .filter(q => q.title);
@@ -429,12 +427,12 @@
         }
 
         function totalScore() {
-            return [...state.singleChoiceQuestions, ...state.fillBlankQuestions, ...state.trueFalseQuestions, ...state.programmingQuestions]
+            return [...state.singleChoiceQuestions, ...state.fillBlankQuestions, ...state.programmingQuestions]
                 .reduce((s, q) => s + (Number(q.score) || 0), 0);
         }
 
         function objectiveTotal() {
-            return [...state.singleChoiceQuestions, ...state.fillBlankQuestions, ...state.trueFalseQuestions]
+            return [...state.singleChoiceQuestions, ...state.fillBlankQuestions]
                 .reduce((s, q) => s + (Number(q.score) || 0), 0);
         }
 
