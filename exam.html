@@ -242,17 +242,16 @@
             color: var(--muted)
         }
 
-        /* 新增：代码展示样式 */
         .code-block {
             margin-top: 12px;
-            background: #0b1220;
+            background: #e6edf3;
             color: #e6edf3;
             border-radius: 10px;
             padding: 12px;
             overflow: auto;
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Noto Sans Mono", monospace;
-            font-size: 13px;
-            line-height: 1.6;
+            font-size: 16px;
+            line-height: 1.7;
             border: 1px solid rgba(255,255,255,0.04);
             white-space: pre;
         }
@@ -260,11 +259,16 @@
         .code-block code {
             display: block;
             white-space: pre;
+            font-size: inherit;
         }
 
         @media (max-width:760px) {
             .row {
                 grid-template-columns: 1fr
+            }
+            .code-block {
+                font-size: 14px;
+                line-height: 1.6;
             }
         }
     </style>
