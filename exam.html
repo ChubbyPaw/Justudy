@@ -434,7 +434,6 @@
             tfWrap.innerHTML = "";
             pgWrap.innerHTML = "";
 
-
             if (state.singleChoiceQuestions.length) {
                 qs("singleChoiceSection").classList.remove("hidden");
                 state.singleChoiceQuestions.forEach((q, idx) => {
@@ -611,6 +610,7 @@
                 state.config = parseConfigSheet(wb.Sheets["ExamConfig"]);
                 state.singleChoiceQuestions = wb.Sheets["SingleChoice"] ? parseSingleChoice(wb.Sheets["SingleChoice"]) : [];
                 state.fillBlankQuestions = wb.Sheets["FillBlank"] ? parseFillBlank(wb.Sheets["FillBlank"]) : [];
+                state.trueFalseQuestions = wb.Sheets["TrueFalse"] ? parseFillBlank(wb.Sheets["TrueFalse"]) : [];
                 state.programmingQuestions = wb.Sheets["Programming"] ? parseProgramming(wb.Sheets["Programming"]) : [];
                 qs("examTitleTop").textContent = state.config.title || "NOIP 在线考试";
                 qs("introText").innerHTML = `
