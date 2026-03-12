@@ -243,8 +243,8 @@
         }
 
         .code-block {
-            background: #12315f;
-            color: #12315f;
+            background: #0b1220;
+            color: #e6edf3;
             border-radius: 10px;
             padding: 12px;
             overflow: auto;
@@ -265,12 +265,12 @@
         .code-block .hljs,
         .code-block pre,
         .code-block pre code {
-            background: #0b1220 !important;
-            background-color: #0b1220 !important;
+            background: transparent !important;
+            background-color: transparent !important;
             color: inherit !important;
             box-shadow: none !important;
             padding: 0 !important;           /* 主题可能给内层加了 padding，移除以使用外层 padding */
-            border-radius: 10px !important;
+            border-radius: 0 !important;
         }
 
         /* 保证 pre 不会有额外 margin 干扰圆角显示 */
@@ -357,7 +357,22 @@
         </section>
     </div>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <style>
+        .code-block .hljs,
+        .code-block pre,
+        .code-block pre code {
+            background: transparent !important;
+            color: inherit !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            border-radius: 0 !important;
+        }
+
+        .code-block pre { margin: 0; }
+
+        .code-block .hljs { background-image: none !important; }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
