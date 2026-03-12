@@ -261,6 +261,24 @@
             font-size: inherit;
         }
 
+        /* 覆盖高亮主题的白底，保持与 .code-block 一致的深色外观 */
+        .code-block .hljs,
+        .code-block pre,
+        .code-block pre code {
+            background: #0b1220 !important;
+            background-color: #0b1220 !important;
+            color: inherit !important;
+            box-shadow: none !important;
+            padding: 0 !important;           /* 主题可能给内层加了 padding，移除以使用外层 padding */
+            border-radius: 10px !important;
+        }
+
+        /* 保证 pre 不会有额外 margin 干扰圆角显示 */
+        .code-block pre { margin: 0; }
+
+        /* 如果主题为 .hljs 添加了背景图片或渐变，也一并清除 */
+        .code-block .hljs { background-image: none !important; }
+
         @media (max-width:760px) {
             .row {
                 grid-template-columns: 1fr
@@ -339,7 +357,7 @@
         </section>
     </div>
 
-    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
