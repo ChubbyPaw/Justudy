@@ -317,6 +317,7 @@
             config: { title: "考试ing", duration: 120, instructions: "" },
             singleChoiceQuestions: [],
             fillBlankQuestions: [],
+            trueFalseQuestions: [],
             programmingQuestions: [],
             timerSeconds: 0,
             timerId: null
@@ -387,14 +388,28 @@
                 .filter(q => q.title);
         }
 
+        // 将各种可能的答案形式规范为 "T" 或 "F"
+        function normalizeTF(v) {
+            const s = text(v).toLowerCase();
+            if (!s) return "";
+            const trueTokens = ["t", "true", "y", "yes", "对", "正确", "是", "1"];
+            const falseTokens = ["f", "false", "n", "no", "错", "错误", "否", "0"];
+            for (const t of trueTokens) if (s === t || s.startsWith(t)) return "T";
+            for (const f of falseTokens) if (s === f || s.startsWith(f)) return "F";
+            const first = s[0];
+            if (first === "t" || first === "y" || first === "对") return "T";
+            if (first === "f" || first === "n" || first === "错") return "F";
+            return text(v).toUpperCase();
+        }
+
         function parseTrueFalse(ws) {
             const rows = XLSX.utils.sheet_to_json(ws, { defval: "" });
             return rows
                 .filter(r => safeLower(r.Enabled || "Y") !== "n")
                 .map((r, idx) => ({
-                    id: text(r.ID || ("TF" + (idx + 1))),  
+                    id: text(r.ID || ("TF" + (idx + 1))),
                     title: text(r.Title),
-                    answer: text(r.Answer),
+                    answer: normalizeTF(r.Answer),
                     score: Number(r.Score || 0) || 0
                 }))
                 .filter(q => q.title);
@@ -414,12 +429,12 @@
         }
 
         function totalScore() {
-            return [...state.singleChoiceQuestions, ...state.fillBlankQuestions, ...state.programmingQuestions]
+            return [...state.singleChoiceQuestions, ...state.fillBlankQuestions, ...state.trueFalseQuestions, ...state.programmingQuestions]
                 .reduce((s, q) => s + (Number(q.score) || 0), 0);
         }
 
         function objectiveTotal() {
-            return [...state.singleChoiceQuestions, ...state.fillBlankQuestions]
+            return [...state.singleChoiceQuestions, ...state.fillBlankQuestions, ...state.trueFalseQuestions]
                 .reduce((s, q) => s + (Number(q.score) || 0), 0);
         }
 
@@ -438,19 +453,19 @@
                 qs("singleChoiceSection").classList.remove("hidden");
                 state.singleChoiceQuestions.forEach((q, idx) => {
                     const html = `
-                        <div class="question">
-                            <div class="q-title">${idx + 1}. ${q.title}</div>
-                            <div class="q-score">分值：${q.score} 分</div>
-                            <div class="options">
-                            ${q.options.map(opt => `
-                                <label class="option">
-                                <input type="radio" name="${q.id}" value="${opt.key}" />
-                                <span>${opt.key}. ${opt.text}</span>
-                                </label>
-                                `).join("")}
+                            <div class="question">
+                                <div class="q-title">${idx + 1}. ${q.title}</div>
+                                <div class="q-score">分值：${q.score} 分</div>
+                                <div class="options">
+                                ${q.options.map(opt => `
+                                    <label class="option">
+                                    <input type="radio" name="${q.id}" value="${opt.key}" />
+                                    <span>${opt.key}. ${opt.text}</span>
+                                    </label>
+                                    `).join("")}
+                                </div>
                             </div>
-                        </div>
-                    `;
+                        `;
                     scWrap.insertAdjacentHTML("beforeend", html);
                 });
             }
@@ -459,177 +474,40 @@
                 qs("fillBlankSection").classList.remove("hidden");
                 state.fillBlankQuestions.forEach((q, idx) => {
                     const html = `
-                        <div class="question">
-                            <div class="q-title">${idx + 1}. ${q.title}</div>
-                            <div class="q-score">分值：${q.score} 分</div>
-                            <div style="margin-top:10px;">
-                                <input type="text" id="${q.id}" placeholder="请输入答案" />
+                            <div class="question">
+                                <div class="q-title">${idx + 1}. ${q.title}</div>
+                                <div class="q-score">分值：${q.score} 分</div>
+                                <div style="margin-top:10px;">
+                                    <input type="text" id="${q.id}" placeholder="请输入答案" />
+                                </div>
                             </div>
-                        </div>
-                    `;
+                        `;
                     fbWrap.insertAdjacentHTML("beforeend", html);
                 });
             }
 
             if (state.trueFalseQuestions.length) {
                 qs("trueFalseSection").classList.remove("hidden");
-                state.fillBlankQuestions.forEach((q, idx) => {
+                state.trueFalseQuestions.forEach((q, idx) => {
                     const html = `
-                        <div class="question">
-                            <div class="q-title">${idx + 1}. ${q.title}</div>
-                            <div class="q-score">分值：${q.score} 分</div>
-                            <div class="options">
-                                <label class="option">
-                                    <input type="radio" name="${q.id}" value="T" />
-                                    <span>正确</span>
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="${q.id}" value="F" />
-                                    <span>错误</span>
-                                </label>
+                            <div class="question">
+                                <div class="q-title">${idx + 1}. ${q.title}</div>
+                                <div class="q-score">分值：${q.score} 分</div>
+                                <div class="options">
+                                    <label class="option">
+                                        <input type="radio" name="${q.id}" value="T" />
+                                        <span>正确</span>
+                                    </label>
+                                    <label class="option">
+                                        <input type="radio" name="${q.id}" value="F" />
+                                        <span>错误</span>
+                                    </label>
+                                </div>
                             </div>
-                        </div>
-                    `;
+                        `;
                     tfWrap.insertAdjacentHTML("beforeend", html);
                 });
             }
 
             if (state.programmingQuestions.length) {
                 qs("programmingSection").classList.remove("hidden");
-                state.programmingQuestions.forEach((q, idx) => {
-                    const html = `
-                        <div class="question">
-                            <div class="q-title">${idx + 1}. ${q.title}</div>
-                            <div class="q-score">分值：${q.score} 分（需人工阅卷）</div>
-                            <div class="muted" style="margin-top:10px;white-space:pre-wrap;line-height:1.9;">${q.description || "请在下方书写代码或解题思路。"}</div>
-                            <div style="margin-top:10px;">
-                            <textarea id="${q.id}" placeholder="请输入代码或解题思路"></textarea>
-                            </div>
-                        </div>
-                    `;
-                    pgWrap.insertAdjacentHTML("beforeend", html);
-                });
-            }
-
-            bindProgress();
-            qs("totalScoreText").textContent = totalScore();
-        }
-
-        function answeredCount() {
-            let count = 0;
-            state.singleChoiceQuestions.forEach(q => {
-                if (document.querySelector(`input[name="${q.id}"]:checked`)) count++;
-            });
-            state.fillBlankQuestions.forEach(q => {
-                if (text(qs(q.id)?.value)) count++;
-            });
-            state.programmingQuestions.forEach(q => {
-                if (text(qs(q.id)?.value)) count++;
-            });
-            return count;
-        }
-
-        function questionCount() {
-            return state.singleChoiceQuestions.length + state.fillBlankQuestions.length + state.programmingQuestions.length;
-        }
-
-        function updateProgress() {
-            const total = questionCount();
-            const done = answeredCount();
-            const pct = total ? Math.round(done * 100 / total) : 0;
-            qs("progressText").textContent = `${done} / ${total}`;
-            qs("progressBar").style.width = pct + "%";
-        }
-
-        function bindProgress() {
-            document.querySelectorAll('input[type="radio"], input[type="text"], textarea').forEach(el => {
-                el.addEventListener("change", updateProgress);
-                el.addEventListener("input", updateProgress);
-            });
-            updateProgress();
-        }
-
-        function startTimer() {
-            if (state.timerId) clearInterval(state.timerId);
-            state.timerSeconds = Math.max(0, Number(state.config.duration) * 60);
-            function renderTimer() {
-                const h = Math.floor(state.timerSeconds / 3600);
-                const m = Math.floor((state.timerSeconds % 3600) / 60);
-                const s = state.timerSeconds % 60;
-                qs("timer").textContent = [h, m, s].map(v => String(v).padStart(2, "0")).join(":");
-            }
-            renderTimer();
-            state.timerId = setInterval(() => {
-                state.timerSeconds--;
-                renderTimer();
-                if (state.timerSeconds <= 0) {
-                    clearInterval(state.timerId);
-                    submitExam(true);
-                }
-            }, 1000);
-        }
-
-        function submitExam(autoSubmit = false) {
-            let score = 0;
-            const lines = [];
-
-            state.singleChoiceQuestions.forEach((q, idx) => {
-                const selected = document.querySelector(`input[name="${q.id}"]:checked`);
-                const ans = selected ? selected.value : "";
-                const ok = ans === q.answer;
-                if (ok) score += q.score;
-                lines.push(`单选题 ${idx + 1}：你的答案 ${ans || "未作答"}，正确答案 ${q.answer || "未设置"}，${ok ? "得分" : "失分"} ${ok ? q.score : 0} / ${q.score}`);
-            });
-
-            state.fillBlankQuestions.forEach((q, idx) => {
-                const ans = text(qs(q.id)?.value);
-                const ok = safeLower(ans) === safeLower(q.answer);
-                if (ok) score += q.score;
-                lines.push(`填空题 ${idx + 1}：你的答案 ${ans || "未作答"}，标准答案 ${q.answer || "未设置"}，${ok ? "得分" : "失分"} ${ok ? q.score : 0} / ${q.score}`);
-            });
-
-            qs("resultPanel").classList.remove("hidden");
-            qs("objectiveScore").textContent = score;
-            qs("objectiveTotal").textContent = objectiveTotal();
-            qs("resultList").innerHTML = `
-                <div>${autoSubmit ? "时间到，系统已自动交卷。" : "你已完成交卷。"}</div>
-                <div style="margin-top:8px;">考生：${text(qs("studentName").value) || "未填写"} / ${text(qs("studentClass").value) || "未填写"}</div>
-                <div style="margin-top:8px;white-space:pre-wrap;">${lines.join("\n")}</div>
-                <div style="margin-top:10px;">程序设计题需要人工阅卷，不计入上方自动得分。</div>
-            `;
-            window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-        }
-
-        async function init() {
-            try {
-                const examFile = getParam("exam");
-                if (!examFile) throw new Error("未指定题库文件");
-                const ab = await fetchArrayBuffer(examFile);
-                const wb = XLSX.read(ab, { type: "array" });
-                if (!wb.Sheets["ExamConfig"]) throw new Error("缺少 ExamConfig 工作表");
-                state.config = parseConfigSheet(wb.Sheets["ExamConfig"]);
-                state.singleChoiceQuestions = wb.Sheets["SingleChoice"] ? parseSingleChoice(wb.Sheets["SingleChoice"]) : [];
-                state.fillBlankQuestions = wb.Sheets["FillBlank"] ? parseFillBlank(wb.Sheets["FillBlank"]) : [];
-                state.trueFalseQuestions = wb.Sheets["TrueFalse"] ? parseTrueFalse(wb.Sheets["TrueFalse"]) : [];
-                state.programmingQuestions = wb.Sheets["Programming"] ? parseProgramming(wb.Sheets["Programming"]) : [];
-                qs("examTitleTop").textContent = state.config.title || "NOIP 在线考试";
-                qs("introText").innerHTML = `
-                    <strong>${state.config.title}</strong><br>
-                    考试时长：${state.config.duration} 分钟<br>
-                    ${state.config.instructions || "请认真作答，客观题自动判分，程序设计题需人工阅卷。"}<br>
-                    当前题库文件：<code>${examFile}</code>
-                `;
-                renderQuestions();
-                startTimer();
-                qs("submitBtn").addEventListener("click", () => submitExam(false));
-            } catch (err) {
-                qs("introText").innerHTML = `
-                    <span style="color:#b42318;font-weight:700;">试卷加载失败：</span>${err.message}<br>
-                    请返回主页检查试卷配置文件和题库路径是否正确。
-                `;
-            }
-        }
-        init();
-    </script>
-</body>
-</html>
