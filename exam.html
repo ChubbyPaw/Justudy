@@ -266,7 +266,6 @@
         .code-block pre,
         .code-block pre code {
             background: transparent !important;
-            background-color: transparent !important;
             color: inherit !important;
             box-shadow: none !important;
             padding: 0 !important;           /* 主题可能给内层加了 padding，移除以使用外层 padding */
@@ -359,6 +358,12 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <style>
+        /* 保持外层 .code-block 为等宽字体，确保内部高亮元素也继承等宽 */
+        .code-block {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Noto Sans Mono", monospace;
+        }
+
+        /* 仅清除高亮主题在内层添加的背景/内边距，同时强制继承等宽字体 */
         .code-block .hljs,
         .code-block pre,
         .code-block pre code {
@@ -367,10 +372,14 @@
             box-shadow: none !important;
             padding: 0 !important;
             border-radius: 0 !important;
+            font-family: inherit !important; /* 强制使用 .code-block 的等宽字体 */
+            font-size: inherit !important;
         }
 
+        /* 保证 pre 不会有额外 margin 干扰圆角显示 */
         .code-block pre { margin: 0; }
 
+        /* 如果主题为 .hljs 添加了背景图片或渐变，也一并清除 */
         .code-block .hljs { background-image: none !important; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
